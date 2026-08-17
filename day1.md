@@ -58,7 +58,7 @@ However since all the cpps files need to be pulled into the executable in the
 end, this brings us on to linking. Linking is the process of gathering all the
 intermediate files and resolving out the places when they point to each other.
 
-If we have a cpp file called foo.cpp and it calls a function in bar.cpp, then
+If we have a c++ file called foo.cpp and it calls a function in bar.cpp, then
 the Linker would have to link the function between foo and bar, so that foo can
 actually call it.
 
