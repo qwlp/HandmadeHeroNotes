@@ -116,3 +116,147 @@ use OutputDebugStringA, so when we start a project in Visual Studio, we get a
 choice between UNICODE and ASCII, defaulting to UNICODE, so that macro will
 replace OutputDebugString with OutputDebugStringW. So we just do it manually, by
 writing out `OutputDebugStringA`.
+
+Now time to talk about varibles!!
+
+The way computer works is that, the CPU (Central Processing Unit) is actually
+the thing that does work inside the computer, it is just an engine manipulating
+numerical values, this is what it does all day long.
+
+It has a gigantic store called memory, any of the numerial values that is stored
+in memory get pulled to the CPU's register then it get put back into memory.
+
+We are going to talk a lot about that model, and that way of thinking gexactly
+what the CPU actually is doing or at least mostly what the CPU is doing on an
+excpetional level.
+
+Just know that everything we type in code, it is just coming up with different
+ways of telling the CPU to manipulate those number, in some way to produce an
+outcome.
+
+So in C what we can do is, any time we want some space for these numbers, we can
+type `int` (remember that int is a just a type of number), then we are going to
+give this a name called Integer and then semi colon.
+
+```c
+int Integer;
+```
+
+This is a standalone statement that will say give me space for a single numeric
+value. Then we can do many thing that looks like math, we can say the Integer is
+equals 5:
+
+```c
+int Integer = 5;
+Integer = 5 + 5;
+Integer = Integer + 5;
+```
+
+Remember that the equals does not math "equals on both side", it means
+assignment, or a copy (copy the right to the left).
+
+So if we go back into debugging mode with this code, and we print the value of
+Integer in the watch window we will have the following:
+
+![Watch Window of Integer](./assets/watchwindwowin.png "Optional title")
+
+We see there is a value here, there is no value there appear across the program.
+So since we haven't given it any value at where our breakpoint is, it can
+literally be any value, all C does is reverse space for it, not replace it yet.
+
+To move to the next line all we have to do is in the Debug menu there is
+something called Step Over (F10), which will do whatever is on the current line
+and move the arrow to the next line, we will see the value change to what we
+expect.
+
+However, in C there is not only one way to say number, in C there are a few
+ways:
+
+```c
+char SmallS; // 8 bits - 256 different values [-128,127]
+short MediumS;
+int LargeS;
+
+char unsigned SmallU; // 8 bits unsigned [0, 255]
+short unsigned MediumU;
+int unsigned LargeU;
+```
+
+So basically, computers are always operating on bit (0s and 1s), so how do store
+bigger things, will they do the same thing as us, they just keep stringing it
+together.
+
+So we don't usually talk about things this small, so the smallest thing we
+usually talk about which is char that is **8 bits**.
+
+Well, how many numbers can it represent in decimal.
+
+If we have two digit, we do 10^2, 100 numbers to represent, and 10^3 for three
+and so on.
+
+So for binary, and 8 bits, that would mean 2^8 or 256.
+
+Well so should a char represent 265, no, since there is something called
+unsigned, which means that it doesn't represent negative values, so a normal
+char represents [-128, 127], while the **char unsigned** will represent [0,
+256].
+
+Now these predefined values, just makes it easier for us to work with. Now then
+you might be thinking if the max value of a **char unsigned** is 255, what
+happens if we go above it, well, it will just wrap around back to 0. So the CPU
+does something called a wrapped addition meaning that is wraps back to 0 (while
+saturated addition means that it keeps it at the max), this is also sometimes
+called an overflow.
+
+Now if we have the following:
+
+```c
+char unsigned Test;
+
+Test = 255;
+Test = Test + 255;
+```
+
+If we go to look at the assembly (Alt+G on the line or Right-Click and Go to
+Assembly) of this, we will get the actual stuff that is happening on the CPU.
+Now we open up the Registers window we will see the following:
+
+![Register](./assets/registervs.png "Optional title")
+
+Well what are register, to boil it down the registers of the CPU, as the CPU go
+through your code what it does is, it pull instructions from memory into
+registers which is inside the CPU which it can operate on, and then puts it back
+into memory.
+
+Now lets look at the assembly:
+
+```asm
+  test = 255;
+003B252F  mov         byte ptr [test],0FFh  
+  test = test + 1;
+003B2533  movzx       eax,byte ptr [test]  
+003B2537  add         eax,1  
+003B253A  mov         byte ptr [test],al
+```
+
+003B252F, this is line of code, we are on, it is actually a memory address,
+remember that Windows needs to load our code into memory and then point the CPU
+to it to start executing.
+
+Now the first asm key word you will see is `mov`, this is a mnemonic or
+human-readable keyword of machine language, which the processor can execute,
+that means that we want to move one memory address to another.
+
+So what is 0FFh this is just a compact hexadecimal form of it. The `h` just
+means its hexadecimal, "0x" gets used by C.
+
+So then the entire `byte ptr [test],0FFh` moves 0FFh (255) into the test byte
+ptr, it doesn't need to move it to any registers since it doesn't need to
+calculate anything.
+
+Then the second line moves the test to eax register, since now it actually moves
+it cause it needs to add 1, then it adds 1 to that register.
+
+Now then the moving "al" back to test, the al means that it is the "a" register
+and "l" means to remove take only the bottom 2, since we are a char unsigned and
+that is all that we can store.
