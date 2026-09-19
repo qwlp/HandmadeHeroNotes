@@ -22,4 +22,19 @@ Page (rwx)
 Page (rwx)
 
 If ran out, it writes to disk and updates perm in the page.
+
+       Memory
+     Intel Encoding   <->     I(Instruction)CACHE     <->      CPU
+
+VMAS          
+Page (rwx) (STACK) The stack can grow
+Page (rwx) (STACK)
+Page (rwx) (STACK)
+Page (rwx) (STACK)
+Page (rwx) (STACK)
 ```
+
+Operators lets you do interesting stuff in the program. `- + = * /` no ^ you'd
+need to call pow(num)
+
+Operators also have precedence, * first, + and all that like math.
